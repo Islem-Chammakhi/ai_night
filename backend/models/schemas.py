@@ -26,6 +26,7 @@ class CandidateMatch(BaseModel):
     embedding_score: float
     reranker_score: float
     skill_score: float
+    match_tier: str
     matched_skills: List[str]
     missing_skills: List[str]
 
