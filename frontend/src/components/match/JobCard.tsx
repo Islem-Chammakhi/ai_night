@@ -244,7 +244,7 @@ export default function JobCard({ job }: Props) {
         {/* View Results */}
         {job.status === "done" && (
           <Button
-            onClick={() => router.push(`/match/${job.id}`)}
+            onClick={() => router.push(`/candidates/${job.id}`)}
             variant="ghost"
             className="w-full gap-2 text-primary hover:text-primary/80"
             size="md"

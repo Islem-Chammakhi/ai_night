@@ -1,19 +1,11 @@
 export const NAV_LINKS = [
     {
-        name: "About",
-        link: "/about",
+        name: "Candidates",
+        link: "/candidates",
     },
     {
-        name: "Integrations",
-        link: "/integrations",
-    },
-    {
-        name: "Pricing",
-        link: "/pricing",
-    },
-    {
-        name: "Blog",
-        link: "/blog",
+        name: "Projects",
+        link: "/projects",
     },
 ];
 

@@ -73,7 +73,7 @@ export default function CandidateMatchPage() {
             </p>
           </div>
           <Button
-            onClick={() => router.push("/match")}
+            onClick={() => router.push("/candidates")}
             variant="default"
             size="md"
             className="gap-2"
