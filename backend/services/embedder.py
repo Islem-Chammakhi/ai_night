@@ -10,7 +10,6 @@ os.makedirs(EMBEDDINGS_PATH, exist_ok=True)
 INDEX_FILE = os.path.join(EMBEDDINGS_PATH, "faiss.index")
 META_FILE = os.path.join(EMBEDDINGS_PATH, "meta.pkl")
 
-# Load model once at startup
 print("Loading embedding model...")
 embedding_model = SentenceTransformer(EMBEDDING_MODEL)
 print("Embedding model loaded.")
@@ -41,7 +40,7 @@ def add_cv_to_index(cv_id: int, text: str):
     dim = vector.shape[1]
 
     if index is None:
-        index = faiss.IndexFlatIP(dim)  # Inner product = cosine similarity (with normalized vectors)
+        index = faiss.IndexFlatIP(dim)
 
     index.add(vector)
     meta.append({"cv_id": cv_id})

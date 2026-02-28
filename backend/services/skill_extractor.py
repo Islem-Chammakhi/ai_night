@@ -8,16 +8,16 @@ client = Groq(api_key=GROQ_API_KEY)
 
 def extract_skills_from_text(text: str) -> list[str]:
     prompt = f"""
-    Extract all technical skills, programming languages, frameworks, tools, 
-    certifications, and soft skills from the following text.
-    
-    Return ONLY a valid JSON array of strings. No explanation, no markdown, no extra text.
-    Example output: ["Python", "FastAPI", "Docker", "AWS", "Agile"]
-    
-    Text:
-    {text[:3000]}
-    """
+Extract all technical skills, programming languages, frameworks, tools,
+certifications, and methodologies from the following text.
 
+Return ONLY a valid JSON array of strings.
+No explanation, no markdown, no extra text.
+Example output: ["Python", "FastAPI", "Docker", "AWS", "Agile"]
+
+Text:
+{text[:3000]}
+"""
     try:
         response = client.chat.completions.create(
             model=GROQ_MODEL,
@@ -26,7 +26,6 @@ def extract_skills_from_text(text: str) -> list[str]:
             max_tokens=500
         )
         raw = response.choices[0].message.content.strip()
-        # Clean in case model adds markdown
         raw = re.sub(r"```json|```", "", raw).strip()
         skills = json.loads(raw)
         return [s.strip() for s in skills if isinstance(s, str)]
@@ -35,19 +34,21 @@ def extract_skills_from_text(text: str) -> list[str]:
         return []
 
 
-def compute_skill_score(cv_skills: list[str], required_skills: list[str]) -> tuple[float, list[str], list[str]]:
+def compute_skill_score(
+    cv_skills: list[str],
+    required_skills: list[str]
+) -> tuple[float, list[str], list[str]]:
+
     if not required_skills:
         return 0.0, [], []
 
-    # Normalize to lowercase for comparison
     cv_skills_lower = [s.lower() for s in cv_skills]
-    
+
     matched = []
     missing = []
 
     for req_skill in required_skills:
         req_lower = req_skill.lower()
-        # Check exact match or if skill is contained in any cv skill
         found = any(
             req_lower in cv_s or cv_s in req_lower
             for cv_s in cv_skills_lower
