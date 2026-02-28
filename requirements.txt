@@ -1,0 +1,24 @@
+$env:PATH = "C:\Python313;C:\Python313\Scripts;" + $env:PATH
+
+
+python --version
+
+python -m ensurepip --upgrade
+
+python -m pip install --upgrade pip
+
+python -m pip install fastapi uvicorn sqlalchemy pdfplumber sentence-transformers faiss-cpu groq python-multipart pydantic python-dotenv
+
+
+
+python -c "import sqlalchemy; print('SQLAlchemy version:', sqlalchemy.__version__)"
+
+
+Remove-Item data\embeddings\*.index
+
+Remove-Item data\embeddings\*.pkl
+
+
+python -m uvicorn main:app --reload --port 8000
+
+python -c "from database import SessionLocal, CV; db = SessionLocal(); db.query(CV).delete(); db.commit(); print('done')"
