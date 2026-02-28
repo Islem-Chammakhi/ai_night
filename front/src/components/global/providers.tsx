@@ -1,7 +1,8 @@
 "use client";
 
-import React from 'react'
+import React from 'react';
 import { Toaster } from "sonner";
+import { JobProvider } from "@/context/JobContext";
 
 interface Props {
     children: React.ReactNode;
@@ -9,14 +10,14 @@ interface Props {
 
 const Providers = ({ children }: Props) => {
     return (
-        <>
+        <JobProvider>
             <Toaster
                 richColors
                 theme="dark"
                 position="bottom-center"
             />
             {children}
-        </>
+        </JobProvider>
     )
 };
 

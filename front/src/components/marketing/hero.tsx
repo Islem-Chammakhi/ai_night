@@ -1,7 +1,7 @@
-import React from 'react'
 import Wrapper from "../global/wrapper";
 import Icons from "../global/icons";
 import Image from "next/image";
+import Link from "next/link";
 import Container from "../global/container";
 import { Button } from "../ui/button";
 
@@ -42,9 +42,11 @@ const Hero = () => {
 
                         <Container delay={0.3}>
                             <div className="mt-6 flex justify-center lg:justify-start">
-                                <Button size="lg">
-                                    Try MVP Demo
-                                </Button>
+                                <Link href="/dashboard">
+                                    <Button size="lg">
+                                        Try MVP Demo
+                                    </Button>
+                                </Link>
                             </div>
                         </Container>
                     </div>

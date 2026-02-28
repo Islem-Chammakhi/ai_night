@@ -17,6 +17,12 @@ export const uploadCV = async (
   return res.data;
 };
 
+// Get all CVs for a specific job
+export const getCVsByJob = async (jobId: number): Promise<UploadedCV[]> => {
+  const res = await API.get<UploadedCV[]>(`/cvs/job/${jobId}`);
+  return res.data;
+};
+
 // Match CVs for a specific job
 export const matchCVs = async (
   requirements: string,
@@ -29,7 +35,17 @@ export const matchCVs = async (
   return res.data;
 };
 
-// Delete all data for a job
+// Delete a single CV by its cv_id
+export const deleteSingleCV = async (cvId: number): Promise<void> => {
+  await API.delete(`/cvs/${cvId}`);
+};
+
+// Delete all CVs for a specific job (also cleans FAISS index)
+export const deleteJobCVs = async (jobId: number): Promise<void> => {
+  await API.delete(`/cvs/job/${jobId}`);
+};
+
+// Delete all data for a job (called from main.py /jobs/{job_id})
 export const deleteJobData = async (jobId: number): Promise<void> => {
   await API.delete(`/jobs/${jobId}`);
 };

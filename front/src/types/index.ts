@@ -4,6 +4,7 @@ export interface KeyPoint {
 
 export interface UploadedCV {
   id: number;
+  job_id: number;
   filename: string;
   candidate_name: string;
   skills: string[];
@@ -48,7 +49,7 @@ export interface Job {
   id: number;
   title: string;
   description: string;
-  keyPoints: string[];
+  requirements: string;
   uploadedCVs: UploadedCV[];
   matchResults: MatchResponse | null;
   status: "idle" | "uploading" | "matching" | "done";

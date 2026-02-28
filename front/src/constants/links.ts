@@ -1,11 +1,11 @@
 export const NAV_LINKS = [
     {
-        name: "About",
-        link: "/about",
+        name: "How it Works",
+        link: "/#how-it-works",
     },
     {
-        name: "Integrations",
-        link: "/integrations",
+        name: "CV Matcher",
+        link: "/dashboard",
     },
     {
         name: "Pricing",
@@ -18,10 +18,10 @@ export const NAV_LINKS = [
 ];
 
 export const PRODUCT_LINKS = [
-    { label: "About", href: "/about" },
+    { label: "CV Matcher", href: "/dashboard" },
     { label: "Integrations", href: "/integrations" },
     { label: "Pricing", href: "/pricing" },
-    { label: "Demo", href: "/contact" },
+    { label: "Demo", href: "/dashboard" },
 ];
 
 export const RESOURCES_LINKS = [

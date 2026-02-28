@@ -68,9 +68,9 @@ const Navbar = () => {
 
                 <Container animation="fadeLeft" delay={0.1}>
                     <div className="flex items-center gap-x-4">
-                        <Link href="/contact" className="hidden lg:block">
+                        <Link href="/dashboard" className="hidden lg:block">
                             <Button size="sm" variant="outline">
-                                Get Started
+                                Match CVs →
                             </Button>
                         </Link>
                         <div className="lg:hidden">
