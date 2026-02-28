@@ -31,6 +31,22 @@ class CandidateMatch(BaseModel):
     missing_skills: List[str]
 
 
+class NearMissCandidate(BaseModel):
+    cv_id: int
+    filename: str
+    candidate_name: Optional[str]
+    their_domain: str
+    their_skills: List[str]
+    required_skills: List[str]
+    skills_they_have: List[str]
+    skills_they_lack: List[str]
+    suggestion: str
+
+
 class MatchResponse(BaseModel):
     total_cvs_scanned: int
     top_candidates: List[CandidateMatch]
+    match_found: bool
+    explanation: Optional[str] = None
+    near_misses: Optional[List[NearMissCandidate]] = None
+    suggestions: Optional[List[str]] = None  # Always at the end
