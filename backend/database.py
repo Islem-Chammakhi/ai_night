@@ -16,10 +16,11 @@ class CV(Base):
     __tablename__ = "cvs"
 
     id = Column(Integer, primary_key=True, index=True)
-    filename = Column(String, unique=True, nullable=False)
+    job_id = Column(Integer, nullable=False, index=True)  # NEW
+    filename = Column(String, nullable=False)
     candidate_name = Column(String, nullable=True)
     raw_text = Column(Text, nullable=False)
-    skills = Column(Text, nullable=True)        # JSON string of extracted skills
+    skills = Column(Text, nullable=True)
     uploaded_at = Column(DateTime, default=datetime.utcnow)
 
 

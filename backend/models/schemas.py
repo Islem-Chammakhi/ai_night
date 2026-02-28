@@ -5,6 +5,7 @@ from datetime import datetime
 
 class CVResponse(BaseModel):
     id: int
+    job_id: int
     filename: str
     candidate_name: Optional[str]
     skills: Optional[List[str]]
@@ -16,6 +17,7 @@ class CVResponse(BaseModel):
 
 class MatchRequest(BaseModel):
     requirements: str
+    job_id: int
 
 
 class CandidateMatch(BaseModel):
@@ -49,4 +51,4 @@ class MatchResponse(BaseModel):
     match_found: bool
     explanation: Optional[str] = None
     near_misses: Optional[List[NearMissCandidate]] = None
-    suggestions: Optional[List[str]] = None  # Always at the end
+    suggestions: Optional[List[str]] = None

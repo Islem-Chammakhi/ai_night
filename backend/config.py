@@ -18,8 +18,8 @@ TOP_K_EMBEDDING = 20      # How many CVs to keep after Judge 1
 TOP_K_FINAL = 10          # How many CVs to show in final results
 
 # Weights for final score
-WEIGHT_EMBEDDING = 0.30
-WEIGHT_RERANKER = 0.40
-WEIGHT_SKILL = 0.30
+WEIGHT_EMBEDDING = 0.25
+WEIGHT_RERANKER = 0.25
+WEIGHT_SKILL = 0.50
 
 MINIMUM_SCORE_THRESHOLD = 0.20  # Lower so we see all relevant candidates

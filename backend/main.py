@@ -1,8 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import create_tables
-from routers import cvs, matching
 
+from routers import cvs, matching
+from fastapi import Depends
+from sqlalchemy.orm import Session
+from database import get_db
 app = FastAPI(
     title="SmartTender AI – CV Matching API",
     description="Automated CV to requirement matching using AI",
@@ -32,3 +35,10 @@ def root():
 @app.get("/health")
 def health():
     return {"status": "ok"}
+
+
+@app.delete("/jobs/{job_id}")
+def delete_job(job_id: int, db: Session = Depends(get_db)):
+    """Called when admin deletes a job from frontend — cleans everything"""
+    from routers.cvs import delete_job_cvs
+    return delete_job_cvs(job_id, db)

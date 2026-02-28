@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from collections import Counter
 import json
 
 from database import get_db, CV
@@ -33,6 +34,8 @@ def get_match_tier(final_score: float) -> str:
         return "Partial Match"
     else:
         return "Weak Match"
+
+
 def build_suggestions(
     results: list,
     near_misses: list,
@@ -41,10 +44,8 @@ def build_suggestions(
 ) -> list[str]:
     suggestions = []
     req_domain = req_profile.get("domain", "the required domain")
-    req_skills = req_profile.get("required_skills", [])
     missing_across_all = []
 
-    # Collect all missing skills across all candidates
     if results:
         for r in results:
             missing_across_all += r.missing_skills
@@ -52,13 +53,10 @@ def build_suggestions(
         for nm in near_misses:
             missing_across_all += nm.skills_they_lack
 
-    # Most common missing skills
-    from collections import Counter
     common_missing = [
         skill for skill, _ in Counter(missing_across_all).most_common(5)
     ]
 
-    # --- Suggestion 1: Based on match results ---
     if results:
         strong = [r for r in results if r.match_tier == "Strong Match"]
         partial = [r for r in results if r.match_tier == "Partial Match"]
@@ -81,6 +79,12 @@ def build_suggestions(
                 f"{', '.join(common_missing)}. "
                 f"Consider filtering for CVs that include these skills."
             )
+        if all(r.skill_score < 0.6 for r in results):
+            suggestions.append(
+                f"🔍 All matched candidates have skill coverage below 60%. "
+                f"Consider reviewing if all requirements are strictly necessary, "
+                f"or expand your CV pool for better results."
+            )
     else:
         suggestions.append(
             f"❌ No matching candidates found for '{req_domain}'. "
@@ -93,14 +97,12 @@ def build_suggestions(
                 f"Consider sourcing CVs specifically for {req_domain} profiles."
             )
 
-    # --- Suggestion 2: CV pool size ---
     if total_cvs < 5:
         suggestions.append(
             f"📂 Your CV database only has {total_cvs} candidate(s). "
             f"Upload more CVs to improve matching accuracy and coverage."
         )
 
-    # --- Suggestion 3: Near miss upskilling ---
     if not results and near_misses:
         closest = near_misses[0]
         if closest.skills_they_have:
@@ -108,16 +110,8 @@ def build_suggestions(
                 f"💡 {closest.candidate_name} is your closest candidate. "
                 f"They already have: {', '.join(closest.skills_they_have[:4])}. "
                 f"With training on {', '.join(closest.skills_they_lack[:3])}, "
-                f"they could become a viable candidate for future {req_domain} tenders."
+                f"they could become viable for future {req_domain} tenders."
             )
-
-    # --- Suggestion 4: Refine requirements ---
-    if results and all(r.skill_score < 0.6 for r in results):
-        suggestions.append(
-            f"🔍 All matched candidates have a skill coverage below 60%. "
-            f"Consider reviewing if all listed requirements are strictly necessary, "
-            f"or expand your CV pool for better results."
-        )
 
     return suggestions
 
@@ -129,25 +123,19 @@ def build_near_miss(
     matched: list,
     missing: list
 ) -> NearMissCandidate:
-    """Build a near miss analysis for a candidate that didn't pass the threshold."""
-
     their_domain = cv_profile.get("domain", "Unknown domain")
-
     their_skills = list(set(
         cv_profile.get("skills", []) +
         cv_profile.get("experience_keywords", []) +
         cv_profile.get("project_keywords", [])
-    ))[:15]  # Limit to 15 most relevant
-
+    ))[:15]
     req_domain = req_profile.get("domain", "the required domain")
-
     suggestion = (
         f"{candidate['candidate_name']} specializes in {their_domain}. "
         f"They match {len(matched)} out of {len(matched) + len(missing)} "
         f"required signals for {req_domain}. "
         f"They are missing key skills: {', '.join(missing[:5])}."
     )
-
     return NearMissCandidate(
         cv_id=candidate["cv_id"],
         filename=candidate["filename"],
@@ -170,39 +158,56 @@ def match_cvs(request: MatchRequest, db: Session = Depends(get_db)):
             detail="Requirements text cannot be empty"
         )
 
-    total_cvs = db.query(CV).count()
+    # Count only CVs for this specific job
+    total_cvs = db.query(CV).filter(CV.job_id == request.job_id).count()
     if total_cvs == 0:
         raise HTTPException(
             status_code=400,
-            detail="No CVs in the system. Please upload CVs first."
+            detail="No CVs uploaded for this job. Please upload CVs first."
         )
 
     print(f"\n{'='*50}")
-    print(f"[MATCHING] Starting match — Total CVs: {total_cvs}")
+    print(f"[MATCHING] Job {request.job_id} — Total CVs: {total_cvs}")
 
     # --- JUDGE 1: Embedding Search ---
     print(f"\n[JUDGE 1] Running embedding search...")
     top_matches = search_similar_cvs(
+        request.job_id,
         request.requirements,
         top_k=TOP_K_EMBEDDING
     )
-    print(f"[JUDGE 1] Found {len(top_matches)} candidates")
+
+    # ✅ DEDUP HERE — before building candidates
+    seen_ids: set[int] = set()
+    unique_matches = []
+    for match in top_matches:
+        if match["cv_id"] not in seen_ids:
+            seen_ids.add(match["cv_id"])
+            unique_matches.append(match)
+    top_matches = unique_matches
+    print(f"[JUDGE 1] {len(top_matches)} unique candidates after dedup")
 
     if not top_matches:
         return MatchResponse(
             total_cvs_scanned=total_cvs,
             top_candidates=[],
             match_found=False,
-            explanation="No candidates were found in the database that are even remotely similar to these requirements.",
-            near_misses=[]
+            explanation="No candidates found for these requirements.",
+            near_misses=[],
+            suggestions=[]
         )
 
+    # Fetch CV details — scoped to this job only
     cv_ids = [m["cv_id"] for m in top_matches]
     cvs_map = {
         cv.id: cv
-        for cv in db.query(CV).filter(CV.id.in_(cv_ids)).all()
+        for cv in db.query(CV).filter(
+            CV.id.in_(cv_ids),
+            CV.job_id == request.job_id
+        ).all()
     }
 
+    # Build candidates list — one entry per unique cv_id
     candidates = []
     for match in top_matches:
         cv = cvs_map.get(match["cv_id"])
@@ -214,10 +219,13 @@ def match_cvs(request: MatchRequest, db: Session = Depends(get_db)):
                 "raw_text": cv.raw_text,
                 "embedding_score": match["embedding_score"]
             })
+            print(f"  → {cv.candidate_name} | embedding: {match['embedding_score']}")
 
     # --- JUDGE 2: Reranking ---
-    print(f"\n[JUDGE 2] Running reranker...")
+    print(f"\n[JUDGE 2] Running reranker on {len(candidates)} candidates...")
     candidates = rerank_candidates(request.requirements, candidates)
+    for c in candidates:
+        print(f"  → {c['candidate_name']} | reranker: {c['reranker_score']}")
 
     # --- JUDGE 3: Deep Profile Matching ---
     print(f"\n[JUDGE 3] Extracting requirements profile...")
@@ -243,9 +251,11 @@ def match_cvs(request: MatchRequest, db: Session = Depends(get_db)):
             4
         )
 
-        print(f"  Final Score: {final_score} | Skill: {skill_score}")
+        print(f"  Embedding: {candidate['embedding_score']} | "
+              f"Reranker: {candidate['reranker_score']} | "
+              f"Skill: {skill_score} | Final: {final_score}")
 
-        passes = final_score >= MINIMUM_SCORE_THRESHOLD and skill_score > 0.0
+        passes = skill_score > 0.0 and final_score >= MINIMUM_SCORE_THRESHOLD
 
         if passes:
             all_results.append(CandidateMatch(
@@ -261,24 +271,43 @@ def match_cvs(request: MatchRequest, db: Session = Depends(get_db)):
                 missing_skills=missing
             ))
         else:
-            # Build near miss for candidates that didn't pass
             near_miss = build_near_miss(
                 candidate, cv_profile, req_profile, matched, missing
             )
             all_near_misses.append((final_score, near_miss))
 
-    # Sort matches by score
+    # Sort results by final score
     all_results.sort(key=lambda x: x.final_score, reverse=True)
 
-    # Sort near misses by score and take top 5
+    # ✅ Guarantee at least top 3 if they have any skill match
+    if len(all_results) < 3:
+        fallback = [
+            nm for score, nm in sorted(all_near_misses, key=lambda x: x[0], reverse=True)
+            if nm.cv_id not in {r.cv_id for r in all_results}
+        ]
+        for nm in fallback[:3 - len(all_results)]:
+            # Promote near miss to result with weak tier
+            all_results.append(CandidateMatch(
+                cv_id=nm.cv_id,
+                filename=nm.filename,
+                candidate_name=nm.candidate_name,
+                final_score=0.0,
+                embedding_score=0.0,
+                reranker_score=0.0,
+                skill_score=0.0,
+                match_tier="Weak Match",
+                matched_skills=nm.skills_they_have,
+                missing_skills=nm.skills_they_lack
+            ))
+
+    # Sort near misses and take top 5
     all_near_misses.sort(key=lambda x: x[0], reverse=True)
     top_near_misses = [nm for _, nm in all_near_misses[:5]]
 
-    # --- Build explanation if no matches ---
-    if not all_results:
+    # No matches at all
+    if not any(r.skill_score > 0 for r in all_results):
         req_domain = req_profile.get("domain", "the required domain")
         req_skills = req_profile.get("required_skills", [])
-
         explanation = (
             f"No candidates in the database match the requirements for '{req_domain}'. "
             f"The tender requires expertise in: {', '.join(req_skills[:6])}. "
@@ -286,27 +315,31 @@ def match_cvs(request: MatchRequest, db: Session = Depends(get_db)):
             f"domains and lack the core required skills. "
             f"Consider uploading CVs from professionals in {req_domain}."
         )
-
-        print(f"\n[MATCHING] No matches found. Showing {len(top_near_misses)} near misses.")
+        print(f"\n[MATCHING] No matches. Showing {len(top_near_misses)} near misses.")
         print(f"{'='*50}\n")
-
         return MatchResponse(
-    total_cvs_scanned=total_cvs,
-    top_candidates=[],
-    match_found=False,
-    explanation=explanation,
-    near_misses=top_near_misses,
-    suggestions=build_suggestions([], top_near_misses, req_profile, total_cvs)
-)
+            total_cvs_scanned=total_cvs,
+            top_candidates=[],
+            match_found=False,
+            explanation=explanation,
+            near_misses=top_near_misses,
+            suggestions=build_suggestions([], top_near_misses, req_profile, total_cvs)
+        )
 
-    print(f"\n[MATCHING] {len(all_results)} match(es) found.")
+    # Final result — only matched candidates (skill > 0)
+    final_results = [r for r in all_results if r.skill_score > 0.0]
+    final_results.sort(key=lambda x: x.final_score, reverse=True)
+
+    print(f"\n[MATCHING] {len(final_results)} match(es) found.")
+    if final_results:
+        print(f"Top: {final_results[0].candidate_name} — {final_results[0].final_score}")
     print(f"{'='*50}\n")
 
     return MatchResponse(
-    total_cvs_scanned=total_cvs,
-    top_candidates=all_results[:TOP_K_FINAL],
-    match_found=True,
-    explanation=None,
-    near_misses=None,
-    suggestions=build_suggestions(all_results[:TOP_K_FINAL], [], req_profile, total_cvs)
-)
+        total_cvs_scanned=total_cvs,
+        top_candidates=final_results[:TOP_K_FINAL],
+        match_found=True,
+        explanation=None,
+        near_misses=top_near_misses if top_near_misses else None,
+        suggestions=build_suggestions(final_results[:TOP_K_FINAL], [], req_profile, total_cvs)
+    )

@@ -42,22 +42,23 @@ Text to analyze:
 
 
 def extract_requirements_profile(requirements_text: str) -> dict:
-    """
-    Extract a structured profile from tender requirements.
-    Returns skills, experience level, domain, and keywords.
-    """
     prompt = f"""
-You are an expert HR analyst reading a job tender or requirements document.
+You are an expert HR analyst reading a job requirements document.
 
-Extract the following information and return ONLY a valid JSON object. No markdown, no explanation.
+Extract the following and return ONLY a valid JSON object. No markdown, no explanation.
 
 {{
-  "required_skills": ["list of all required technical skills, tools, frameworks"],
-  "domain": "main domain of the job (e.g. cybersecurity, web development, data science, DevOps)",
+  "required_skills": ["list of all required technical skills, tools, frameworks, APIs"],
+  "domain": "main domain (e.g. AI development, backend development, web development, DevOps, cybersecurity)",
   "experience_level": "junior / mid / senior",
-  "keywords": ["important keywords from the requirements that indicate domain expertise"],
-  "certifications": ["any required certifications"]
+  "keywords": ["important domain keywords that indicate expertise in this field"],
+  "certifications": ["any required certifications or qualifications"]
 }}
+
+IMPORTANT:
+- For AI jobs: include keywords like generative AI, machine learning, AI APIs, deep learning
+- For backend jobs: include keywords like microservices, containerization, CI/CD
+- Be comprehensive — missing a keyword means a qualified candidate might be missed
 
 Requirements text:
 {requirements_text[:3000]}
@@ -85,22 +86,24 @@ Requirements text:
 
 
 def extract_cv_profile(cv_text: str) -> dict:
-    """
-    Extract a structured profile from a CV.
-    Returns skills, experience, projects keywords, and domain.
-    """
     prompt = f"""
 You are an expert HR analyst reading a candidate CV.
 
-Extract the following information and return ONLY a valid JSON object. No markdown, no explanation.
+Extract the following and return ONLY a valid JSON object. No markdown, no explanation.
 
 {{
-  "skills": ["all technical skills, tools, frameworks mentioned anywhere in the CV"],
-  "domain": "main domain of the candidate (e.g. web development, data science, DevOps)",
-  "experience_keywords": ["keywords from experience section describing what they worked on"],
-  "project_keywords": ["technologies and concepts from project descriptions"],
-  "certifications": ["any certifications mentioned"]
+  "skills": ["ALL technical skills, tools, frameworks mentioned anywhere in the CV"],
+  "domain": "main domain of the candidate (e.g. web development, AI development, DevOps, backend development)",
+  "experience_keywords": ["keywords from experience section — what they built, what problems they solved"],
+  "project_keywords": ["ALL technologies, APIs, tools and concepts mentioned in EVERY project description"],
+  "certifications": ["any certifications or awards mentioned, including hackathon wins"]
 }}
+
+IMPORTANT: 
+- Extract skills from EVERY section: skills section, experience, projects, summary
+- If a project uses an AI API or generative AI tool, include it explicitly
+- Include hackathon participation as a keyword
+- Do not miss any technology mentioned anywhere in the text
 
 CV text:
 {cv_text[:4000]}
