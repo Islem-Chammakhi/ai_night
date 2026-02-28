@@ -8,12 +8,8 @@ export const NAV_LINKS = [
         link: "/dashboard",
     },
     {
-        name: "Pricing",
-        link: "/pricing",
-    },
-    {
-        name: "Blog",
-        link: "/blog",
+        name: "Tender Detection",
+        link: "/tenders",
     },
 ];
 

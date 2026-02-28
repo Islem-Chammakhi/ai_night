@@ -44,7 +44,7 @@ const Hero = () => {
                             <div className="mt-6 flex justify-center lg:justify-start">
                                 <Link href="/dashboard">
                                     <Button size="lg">
-                                        Try MVP Demo
+                                        CV Matcher
                                     </Button>
                                 </Link>
                             </div>
