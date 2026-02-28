@@ -1,0 +1,37 @@
+<svg width="56" height="59" viewBox="0 0 56 59" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_20001_543)">
+<g clip-path="url(#clip1_20001_543)">
+<g clip-path="url(#clip2_20001_543)">
+<g filter="url(#filter0_i_20001_543)">
+<path d="M34.3832 8.46278L21.5595 1.06006L8.73584 8.46278M34.3832 8.46278L21.5595 15.8655M34.3832 8.46278V25.3587M8.73584 8.46278L21.5595 15.8655M8.73584 8.46278V42.2546L21.5595 49.6574L34.3832 57.0601M21.5595 15.8655V32.7615M34.3832 25.3587L27.9713 29.0601L21.5595 32.7615M34.3832 25.3587L47.2068 32.7615M34.3832 57.0601V40.1642M34.3832 57.0601L47.2068 49.6574V32.7615M21.5595 32.7615L34.3832 40.1642M34.3832 40.1642L47.2068 32.7615" stroke="#E05151" stroke-linejoin="round"/>
+<path d="M21.5595 15.8657L8.73584 8.46289V42.2548L21.5595 49.6575L34.3832 57.0602V40.1643L21.5595 32.7616V15.8657Z" stroke="#E05151" stroke-linejoin="round"/>
+<path d="M34.3833 8.46289L21.5596 15.8657V32.7616L27.9714 29.0602L34.3833 25.3588V8.46289Z" stroke="#E05151" stroke-linejoin="round"/>
+<path d="M47.2069 32.7615L34.3833 40.1642V57.0601L47.2069 49.6574V32.7615Z" stroke="#E05151" stroke-linejoin="round"/>
+<path d="M34.3832 8.46278L21.5595 1.06006L8.73584 8.46278L21.5595 15.8655L34.3832 8.46278Z" stroke="#E05151" stroke-linejoin="round"/>
+<path d="M21.5596 32.7614L34.3833 40.1641L47.2069 32.7614L34.3833 25.3586L27.9714 29.06L21.5596 32.7614Z" stroke="#E05151" stroke-linejoin="round"/>
+</g>
+</g>
+</g>
+</g>
+<defs>
+<filter id="filter0_i_20001_543" x="8.23584" y="0.560059" width="39.4712" height="58.0742" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+<feOffset dy="1.07423"/>
+<feGaussianBlur stdDeviation="6.44538"/>
+<feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
+<feColorMatrix type="matrix" values="0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.32 0"/>
+<feBlend mode="normal" in2="shape" result="effect1_innerShadow_20001_543"/>
+</filter>
+<clipPath id="clip0_20001_543">
+<rect width="56" height="58" fill="white" transform="translate(0 0.0600586)"/>
+</clipPath>
+<clipPath id="clip1_20001_543">
+<rect width="56" height="58" fill="white" transform="translate(0 0.0600586)"/>
+</clipPath>
+<clipPath id="clip2_20001_543">
+<rect width="56" height="58" fill="white" transform="translate(0 0.0600586)"/>
+</clipPath>
+</defs>
+</svg>
