@@ -9,7 +9,7 @@ EMBEDDINGS_PATH = os.getenv("EMBEDDINGS_PATH", "./data/embeddings/")
 CVS_PATH = os.getenv("CVS_PATH", "./data/cvs/")
 
 # AI Models config
-EMBEDDING_MODEL = "BAAI/bge-large-en-v1.5"
+EMBEDDING_MODEL = "BAAI/bge-m3"
 RERANKER_MODEL = "cross-encoder/ms-marco-MiniLM-L-6-v2"
 GROQ_MODEL = "llama-3.1-8b-instant"
 
@@ -21,3 +21,5 @@ TOP_K_FINAL = 10          # How many CVs to show in final results
 WEIGHT_EMBEDDING = 0.30
 WEIGHT_RERANKER = 0.40
 WEIGHT_SKILL = 0.30
+
+MINIMUM_SCORE_THRESHOLD = 0.55

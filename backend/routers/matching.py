@@ -12,7 +12,7 @@ from config import (
     TOP_K_FINAL,
     WEIGHT_EMBEDDING,
     WEIGHT_RERANKER,
-    WEIGHT_SKILL
+    WEIGHT_SKILL,MINIMUM_SCORE_THRESHOLD
 )
 
 router = APIRouter(prefix="/match", tags=["Matching"])
@@ -119,6 +119,8 @@ def match_cvs(request: MatchRequest, db: Session = Depends(get_db)):
 
     # Sort by final score
     results.sort(key=lambda x: x.final_score, reverse=True)
+    # Filter out candidates below minimum threshold
+    results = [r for r in results if r.final_score >= MINIMUM_SCORE_THRESHOLD]
 
     print(f"\n[MATCHING] Done. Top candidate: "
           f"{results[0].candidate_name} with score {results[0].final_score}")
