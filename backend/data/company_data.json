@@ -1,0 +1,31 @@
+{
+  "company_name": "Inetum",
+  "focus_domains": ["Cloud", "DevOps"],
+  "secondary_domains": ["Data", "Machine Learning"],
+  "core_skills": [
+    "AWS",
+    "Azure",
+    "Kubernetes",
+    "Docker",
+    "Terraform",
+    "CI/CD",
+    "Jenkins",
+    "GitLab CI",
+    "Linux",
+    "Networking"
+  ],
+  "ml_skills": ["Python", "MLflow", "Data Engineering", "Model Deployment"],
+  "excluded_domains": [
+    "Construction",
+    "Road Works",
+    "Steel Supply",
+    "Furniture",
+    "Medical Equipment"
+  ],
+  "regions": ["Tunisia", "France", "Europe"],
+  "min_budget_eur": 300000,
+  "max_budget_eur": 6000000,
+  "preferred_contract_duration_months": [6, 36],
+  "required_language": ["French", "English"],
+  "text": "We deliver Cloud and DevOps projects (AWS, Azure, Kubernetes, Docker, Terraform, CI/CD, Jenkins). We also support ML/Data projects (Python, MLflow, model deployment). Preferred regions: Tunisia, France, Europe. Minimum budget 300k EUR. We exclude construction, road works, steel supply, furniture, medical equipment."
+}
