@@ -48,3 +48,8 @@ def delete_job(job_id: int, db: Session = Depends(get_db)):
     """Called when admin deletes a job from frontend — cleans CVs + FAISS index."""
     from routers.cvs import delete_job_cvs
     return delete_job_cvs(job_id, db)
+
+
+@app.post("/score-tenders")
+def score_tenders(data):
+    pass

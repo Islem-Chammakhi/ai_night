@@ -6,9 +6,6 @@ from sentence_transformers import SentenceTransformer
 import numpy as np
 import matplotlib.pyplot as plt
 
-# ! SmartTender-specific normalization and parsing logic for tenders and company profile.
-# ! running them code in this file will compute semantic similarity scores for the tenders and print the top 10 results.
-
 SKILL_ALIASES = {
     "aws": "AWS",
     "amazon web services": "AWS",
